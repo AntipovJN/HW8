@@ -9,5 +9,4 @@ public interface List<T> {
     T remove(T t); // удалять первый, который встретится
     int size();
     boolean isEmpty();
-
 }

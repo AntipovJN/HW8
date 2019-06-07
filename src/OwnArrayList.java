@@ -1,34 +1,30 @@
 import java.util.Arrays;
 
-public class ownArrayList<T> implements List {
+public class OwnArrayList<T> implements List {
 
-    private final int INITIALIZE_CAPACITY = 3;
+    private static final int INITIALIZE_CAPACITY = 10;
 
     private int capacity;
-    private int newCapacity;
-    private int oldCapacity;
     private int lastIndex;
     private T[] valuesArray;
 
 
-    public ownArrayList() {
+    public OwnArrayList() {
         valuesArray = (T[]) new Object[INITIALIZE_CAPACITY];
-        this.capacity = INITIALIZE_CAPACITY;
-        newCapacity = INITIALIZE_CAPACITY;
+        capacity = INITIALIZE_CAPACITY;
         lastIndex = 0;
     }
 
-    public ownArrayList(int capacity) {
+    public OwnArrayList(int capacity) {
         valuesArray = (T[]) new Object[capacity];
         this.capacity = capacity;
-        newCapacity = capacity;
         lastIndex = 0;
 
     }
 
     @Override
     public void add(Object value) {
-        if (valuesArray[capacity - 1] != null) {
+        if (valuesArray.length < lastIndex) {
             capacityIncrease();
         }
         valuesArray[lastIndex] = (T) value;
@@ -51,7 +47,7 @@ public class ownArrayList<T> implements List {
         }
         capacityIncrease(list.size());
         for (int i = 0; i < list.size(); i++) {
-            valuesArray[oldCapacity + i] = (T) list.get(i);
+            valuesArray[capacity + i] = (T) list.get(i);
         }
     }
 
@@ -64,50 +60,43 @@ public class ownArrayList<T> implements List {
     @Override
     public void set(Object value, int index) {
         checkIndex(index);
+        if (valuesArray[index] == null) {
+            throw new RuntimeException("cell with " + index + " index is empty");
+        }
         valuesArray[index] = (T) value;
     }
 
     @Override
     public T remove(int index) {
-        checkIndex(index);
-        int j = 0;
-        T[] newArrayOfValues = (T[]) new Object[lastIndex-1];
-        T foundedElement = null;
-        for (int i = 0; i <= lastIndex - 1; i++) {
-            if (i != index) {
-                newArrayOfValues[j] = valuesArray[i];
-                j++;
-            } else {
-                foundedElement = valuesArray[i];
-
-            }
-        }
-        valuesArray = newArrayOfValues;
-        lastIndex--;
-        return foundedElement;
+        T removedElement = valuesArray[index];
+        int capacity = valuesArray.length - index - 1;
+       removeElementFromArray(index,capacity);
+       lastIndex--;
+        return removedElement;
     }
 
     @Override
     public T remove(Object o) {
-        T foundedElement = null;
-        if (o != null) {
-            T[] newArrayOfValues = (T[]) new Object[lastIndex-1];
-            int j = 0;
-            for (int i = 0; i <= lastIndex - 1; i++) {
-                if (!valuesArray[i].equals((T) o)) {
-                    newArrayOfValues[j] = valuesArray[i];
-                    j++;
-                } else {
-                    foundedElement = valuesArray[i];
-
-                }
+        T removedElement = null;
+        int index = 0;
+        for (; index < valuesArray.length; index++) {
+            if (valuesArray[index].equals((T) o)) {
+                removedElement = valuesArray[index];
+                break;
             }
-            valuesArray = newArrayOfValues;
-            lastIndex--;
-        } else {
-            throw new RuntimeException("object not find");
         }
-        return foundedElement;
+        int capacity = valuesArray.length - index - 1;
+        removeElementFromArray(index, capacity);
+        lastIndex--;
+        return removedElement;
+    }
+
+    private void removeElementFromArray(int index, int capacity) {
+        if (capacity > 0) {
+            System.arraycopy(valuesArray, index + 1, valuesArray, index, capacity);
+        } else {
+            throw new RuntimeException("Cant remove element");
+        }
     }
 
     @Override
@@ -117,28 +106,21 @@ public class ownArrayList<T> implements List {
 
     @Override
     public boolean isEmpty() {
-        if (valuesArray[0] == null) {
-            return true;
-        }
-        return false;
+        return lastIndex == 0;
     }
 
     private void capacityIncrease() {
-        newCapacity += capacity >> 1;
-        valuesArray = Arrays.copyOf(valuesArray, newCapacity);
-        oldCapacity = capacity;
-        capacity = newCapacity;
+        capacity += capacity >> 1;
+        valuesArray = Arrays.copyOf(valuesArray, capacity);
     }
 
     private void capacityIncrease(int length) {
         if (length <= capacity) {
             throw new IllegalArgumentException("New capacity to small");
         }
-        newCapacity += length;
-        valuesArray = Arrays.copyOf(valuesArray, newCapacity);
-        oldCapacity = capacity;
-        capacity = newCapacity;
-    }
+        capacity += length;
+        valuesArray = Arrays.copyOf(valuesArray, capacity);
+          }
 
     private void checkIndex(int index) {
         if (index < 0) {
@@ -154,11 +136,9 @@ public class ownArrayList<T> implements List {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ownArrayList<?> that = (ownArrayList<?>) o;
+        OwnArrayList<?> that = (OwnArrayList<?>) o;
 
         if (capacity != that.capacity) return false;
-        if (newCapacity != that.newCapacity) return false;
-        if (oldCapacity != that.oldCapacity) return false;
         if (lastIndex != that.lastIndex) return false;
         // Probably incorrect - comparing Object[] arrays with Arrays.equals
         return Arrays.equals(valuesArray, that.valuesArray);
@@ -168,8 +148,6 @@ public class ownArrayList<T> implements List {
     public int hashCode() {
         int result = INITIALIZE_CAPACITY;
         result = 31 * result + capacity;
-        result = 31 * result + newCapacity;
-        result = 31 * result + oldCapacity;
         result = 31 * result + lastIndex;
         result = 31 * result + Arrays.hashCode(valuesArray);
         return result;
@@ -180,8 +158,6 @@ public class ownArrayList<T> implements List {
         return "ownArrayList{" +
                 "INITIALIZE_CAPACITY=" + INITIALIZE_CAPACITY +
                 ", capacity=" + capacity +
-                ", newCapacity=" + newCapacity +
-                ", oldCapacity=" + oldCapacity +
                 ", lastIndex=" + lastIndex +
                 ", valuesArray=" + Arrays.toString(valuesArray) +
                 '}';
