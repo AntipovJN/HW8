@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class OwnArrayList<T> implements List {
+public class OwnArrayList<T> implements List<T> {
 
     private static final int INITIALIZE_CAPACITY = 10;
 
@@ -23,31 +23,31 @@ public class OwnArrayList<T> implements List {
     }
 
     @Override
-    public void add(Object value) {
+    public void add(T value) {
         if (valuesArray.length < lastIndex) {
             capacityIncrease();
         }
-        valuesArray[lastIndex] = (T) value;
+        valuesArray[lastIndex] = value;
         lastIndex++;
     }
 
 
     @Override
-    public void add(Object value, int index) {
+    public void add(T value, int index) {
         if (index >= capacity) {
             capacityIncrease(index);
         }
-        valuesArray[index] = (T) value;
+        valuesArray[index] = value;
     }
 
     @Override
-    public void addAll(List list) {
+    public void addAll(List<T> list) {
         if (list.size() <= 0) {
             return;
         }
         capacityIncrease(list.size());
         for (int i = 0; i < list.size(); i++) {
-            valuesArray[capacity + i] = (T) list.get(i);
+            valuesArray[capacity + i] = list.get(i);
         }
     }
 
@@ -58,12 +58,12 @@ public class OwnArrayList<T> implements List {
     }
 
     @Override
-    public void set(Object value, int index) {
+    public void set(T value, int index) {
         checkIndex(index);
         if (valuesArray[index] == null) {
             throw new RuntimeException("cell with " + index + " index is empty");
         }
-        valuesArray[index] = (T) value;
+        valuesArray[index] =  value;
     }
 
     @Override
@@ -76,11 +76,11 @@ public class OwnArrayList<T> implements List {
     }
 
     @Override
-    public T remove(Object o) {
+    public T remove(T o) {
         T removedElement = null;
         int index = 0;
         for (; index < valuesArray.length; index++) {
-            if (valuesArray[index].equals((T) o)) {
+            if (valuesArray[index].equals(o)) {
                 removedElement = valuesArray[index];
                 break;
             }
