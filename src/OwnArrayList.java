@@ -24,19 +24,19 @@ public class OwnArrayList<T> implements List<T> {
 
     @Override
     public void add(T value) {
-        if (valuesArray.length < lastIndex) {
+        if (valuesArray.length <= lastIndex) {
             capacityIncrease();
         }
         valuesArray[lastIndex] = value;
         lastIndex++;
     }
 
-
     @Override
     public void add(T value, int index) {
-        if (index >= capacity) {
+        if (valuesArray.length < lastIndex) {
             capacityIncrease(index);
         }
+        System.arraycopy(valuesArray, index, valuesArray, index+1, valuesArray.length-index-1);
         valuesArray[index] = value;
     }
 
